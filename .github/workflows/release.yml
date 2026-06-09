@@ -1,0 +1,49 @@
+name: Release to NuGet
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: read
+  id-token: write # required for NuGet trusted publishing (OIDC)
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # Guard: the git tag (without the leading "v") must match <Version> in the csproj.
+      - name: Verify tag matches project version
+        run: |
+          VERSION=$(grep -oPm1 '(?<=<Version>)[^<]+' src/FellowAiden/FellowAiden.csproj)
+          TAG="${GITHUB_REF_NAME#v}"
+          echo "tag=$TAG version=$VERSION"
+          if [ "$VERSION" != "$TAG" ]; then
+            echo "::error::Tag $TAG does not match csproj <Version> $VERSION" >&2
+            exit 1
+          fi
+
+      - run: dotnet restore
+      - run: dotnet build -c Release --no-restore
+      - run: dotnet test -c Release --no-build
+      - name: Pack
+        run: dotnet pack src/FellowAiden/FellowAiden.csproj -c Release -o artifacts
+
+      # OIDC trusted publishing: exchanges the GitHub OIDC token for a
+      # short-lived NuGet API key. Configure the trusted publisher on nuget.org
+      # and set the NUGET_USER secret to your nuget.org username.
+      - name: NuGet login (OIDC → temporary API key)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Push to NuGet
+        run: dotnet nuget push "artifacts/*.nupkg" --api-key ${{ steps.login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
