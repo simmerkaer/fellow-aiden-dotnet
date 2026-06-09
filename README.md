@@ -87,10 +87,11 @@ or `FellowAidenAuthException`; all derive from `FellowAidenException`.
 
 ## Releasing
 
-Bump `<Version>` in `src/FellowAiden/FellowAiden.csproj`, then tag and push:
+Bump `<Version>` in `src/FellowAiden/FellowAiden.csproj`, then push an
+**annotated** tag (a lightweight `git tag vX` is *not* pushed by `--follow-tags`):
 
 ```sh
-git tag v1.2.3
+git tag -a v1.2.3 -m "v1.2.3"
 git push --follow-tags
 ```
 
