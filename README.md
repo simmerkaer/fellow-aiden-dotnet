@@ -18,8 +18,6 @@ Python library [`9b/fellow-aiden`](https://github.com/9b/fellow-aiden).
 | --- | --- | --- |
 | TypeScript / JavaScript | [`fellow-aiden`](https://www.npmjs.com/package/fellow-aiden) (npm) | [fellow-aiden-ts](https://github.com/simmerkaer/fellow-aiden-ts) |
 | **.NET** (this repo) | [`FellowAiden`](https://www.nuget.org/packages/FellowAiden) (NuGet) | [fellow-aiden-dotnet](https://github.com/simmerkaer/fellow-aiden-dotnet) |
-| Python | _planned_ | — |
-
 ## Install
 
 ```sh
